@@ -106,11 +106,12 @@
 
       <!--Information for all orders-->
       <div *ngFor="let order of appData.loggedInUser.Orders; index as orderIndex">
-        <div *ngIf="order.BuyerMessage != null" class="single-entry-container">
+        <div class="single-entry-container">
           <div class="image-container">
             <div class="image-flex-container">
-              <div class="image" [style.background-image]="'url('+order.ListingMessage.ImageUrls[0]+')'" style="cursor: auto;">
+              <div *ngIf="order.BuyerMessage != null" class="image" [style.background-image]="'url('+order.ListingMessage.ImageUrls[0]+')'" style="cursor: auto;">
               </div>
+              <!--TODO: Show an error image when the BuyerMessage is missing.-->
             </div>
           </div>
           <div class="summary-content-container">
@@ -543,9 +544,11 @@
                   </div>
                 </div>
                 <div *ngIf="order.BuyerMessage == null">
-                  Sorry, but the details for this order either weren't parsable or weren't decryptable. This could
-                  have been due to a bug in the buyer's software. If this is a problem, simply cancel or reject the
-                  order, ideally including a "reject reason" to let the buyer know why there was an issue.
+                  Sorry, but the details for this order either weren't parsable or weren't decryptable. This
+                  typically happens when an order gets created on a machine other than the one you're currently
+                  using, and it's due to the fact that the order information was end-to-end encrypted so that
+                  only the merchant can see it (meaning you can't decrypt it). If this is a problem, we 
+                  recommend messaging the merchant to remind you of the details.
                 </div>
               </div>
 
