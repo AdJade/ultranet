@@ -207,9 +207,11 @@ func (fes *FrontendServer) updateUserFields(user *User, topMerchantMap map[strin
 		user.LocalState.PublicKeyToNickname[sarahPkBase58Check] = "sarah c0nn0r"
 	}
 
-	// Sort the messages by their timestamp.
+	// Sort the messages by their timestamp in order of highest timestamp
+	// to lowest. Doing it this way makes the newest messages sort to the
+	// top.
 	sort.Slice(messageEntries, func(ii, jj int) bool {
-		return messageEntries[ii].TstampNanos < messageEntries[jj].TstampNanos
+		return messageEntries[ii].TstampNanos > messageEntries[jj].TstampNanos
 	})
 	// Contacts organized by their public key.
 	contactMap := make(map[string]*MessageContactResponse)
@@ -314,6 +316,13 @@ func (fes *FrontendServer) updateUserFields(user *User, topMerchantMap map[strin
 
 		user.LocalState.OrderedContactsWithMessages = append(
 			user.LocalState.OrderedContactsWithMessages, contactEntry)
+	}
+	// Go through the messages for each contact and reverse them to get the
+	// proper ordering.
+	for _, contact := range user.LocalState.OrderedContactsWithMessages {
+		sort.Slice(contact.Messages, func(ii, jj int) bool {
+			return contact.Messages[ii].TstampNanos < contact.Messages[jj].TstampNanos
+		})
 	}
 
 	// Get the UtxoEntries from the augmented view
