@@ -414,7 +414,7 @@ func (fes *FrontendServer) GetTopCategories(ww http.ResponseWriter, req *http.Re
 
 	if err := json.NewEncoder(ww).Encode(res); err != nil {
 		glog.Error(errors.Wrapf(err, "GetTopCategories: Problem serializing object to "+
-			"JSON: %v\n Request: %v", res, req))
+			"JSON: %v\n Request: %v, Error: %v", res, req, err))
 	}
 }
 

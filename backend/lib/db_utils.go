@@ -1736,19 +1736,15 @@ func GetBadgerDbPath(dataDir string) string {
 }
 
 func DbPutLocalUserDataWithTxn(userData *LocalUserData, txn *badger.Txn) error {
-	userDataBuf := bytes.NewBuffer([]byte{})
-	err := gob.NewEncoder(userDataBuf).Encode(userData)
+	buf, err := json.Marshal(userData)
 	if err != nil {
-		// TODO: Fix a bug where nil map values break serialization. This happens,
-		// for example, when loading an account from a seed that had placed an
-		// order encrypted with the merchant key
 		scs := spew.ConfigState{DisableMethods: true, Indent: "\t"}
 		fmt.Println("Dumping unserializable user object for debugging: ", scs.Sdump(userData))
 		glog.Errorf("DbPutLocalUserDataWithTxn: Problem encoding user data: %v", err)
 	}
-
-	return txn.Set(_KeyLocalUserData, userDataBuf.Bytes())
+	return txn.Set(_KeyLocalUserData, buf)
 }
+
 func DbPutLocalUserData(userData *LocalUserData, handle *badger.DB) error {
 	return handle.Update(func(txn *badger.Txn) error {
 		return DbPutLocalUserDataWithTxn(userData, txn)
@@ -1762,7 +1758,7 @@ func DbGetLocalUserDataWithTxn(txn *badger.Txn) *LocalUserData {
 		return nil
 	}
 	err = userDataItem.Value(func(valBytes []byte) error {
-		if err := gob.NewDecoder(bytes.NewReader(valBytes)).Decode(&userData); err != nil {
+		if err := json.Unmarshal(valBytes, &userData); err != nil {
 			glog.Errorf("DbGetLocalUserDataWithTxn: Problem decoding user data: %v", err)
 		}
 		return nil

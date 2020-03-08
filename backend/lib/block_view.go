@@ -538,7 +538,7 @@ func (mm *MessageKey) String() string {
 
 // StringKey is useful for creating maps that need to be serialized to JSON.
 func (mm *MessageKey) StringKey(params *UltranetParams) string {
-	return PkToString(mm.PublicKey[:], params) + string(UintToBuf(mm.TstampNanos))
+	return PkToString(mm.PublicKey[:], params) + "_" + fmt.Sprint(mm.TstampNanos)
 }
 
 // MessageEntry stores the essential content of a message transaction.
