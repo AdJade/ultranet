@@ -4,6 +4,7 @@ import (
 	"encoding/hex"
 	"flag"
 	"fmt"
+	"github.com/sarahc0nn0r/ultranet/backend/lib"
 	"log"
 	"math"
 	"math/rand"
@@ -14,7 +15,6 @@ import (
 	"reflect"
 	"strings"
 	"time"
-	"ultranet/backend/lib"
 
 	"github.com/btcsuite/btcd/addrmgr"
 	"github.com/btcsuite/btcd/btcd_lib"
@@ -522,8 +522,8 @@ func main() {
 		}
 	}()
 
-	opts := badger.DefaultOptions
-	opts.Dir = lib.GetBadgerDbPath(dataDir)
+	dir := lib.GetBadgerDbPath(dataDir)
+	opts := badger.DefaultOptions(dir)
 	opts.Truncate = true
 	opts.ValueDir = lib.GetBadgerDbPath(dataDir)
 	glog.Infof("BadgerDB Dir: %v", opts.Dir)
